@@ -33,8 +33,9 @@ def minus_cash(playlist: list) -> list:
 #Add first song and initialize playlist
 playlist = os.listdir('music')
 playlist = minus_cash(playlist)
-pygame.mixer.music.load('music/'+playlist[0])
-first = pygame.mixer.Sound('music/'+playlist[0])
+if len(playlist) > 0:
+    pygame.mixer.music.load('music/'+playlist[0])
+    first = pygame.mixer.Sound('music/'+playlist[0])
 
 
 class ExampleApp(QMainWindow):
@@ -56,26 +57,34 @@ class ExampleApp(QMainWindow):
         self.pic = QtGui.QIcon()
         self.pr = QtGui.QIcon()
 
-        # Play and set first music
-        pygame.mixer.music.play()
-        pygame.mixer.music.set_volume(0.88)
 
-        # Settings of GUI elements and calling current methods
-        self.ui.pause_button.clicked.connect(self.pause_resume)
-        self.ui.prev_button.clicked.connect(self.prev)
-        self.ui.next_button.clicked.connect(self.next)
-        self.ui.volume_button.clicked.connect(self.volume_off)#
-        self.ui.add_song_button.clicked.connect(self.open_folder)#
-        self.ui.settings_button.clicked.connect(self.move_button)#
-        self.ui.volume_slider.valueChanged.connect(self.volume)
-        self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
-        self.labels(playlist[self.i], int(pygame.mixer.Sound.get_length(first)))
+        if len(playlist) == 0:
+        # Condition opens music folder if it's clear
+            self.open_folder()
 
-        # Timer for update-function
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.update)
-        self.timer.setInterval(500)
-        self.timer.start()
+        elif len(playlist) > 0:
+        # If not - player works
+            # Play and set first music
+            pygame.mixer.music.play()
+            pygame.mixer.music.set_volume(0.88)
+            self.pause_resume()
+
+            # Settings of GUI elements and calling current methods
+            self.ui.pause_button.clicked.connect(self.pause_resume)
+            self.ui.prev_button.clicked.connect(self.prev)
+            self.ui.next_button.clicked.connect(self.next)
+            self.ui.volume_button.clicked.connect(self.volume_off)
+            self.ui.add_song_button.clicked.connect(self.open_folder)
+            self.ui.settings_button.clicked.connect(self.move_button)
+            self.ui.volume_slider.valueChanged.connect(self.volume)
+            self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
+            self.labels(playlist[self.i], int(pygame.mixer.Sound.get_length(first)))
+
+            # Timer for update-function
+            self.timer = QtCore.QTimer()
+            self.timer.timeout.connect(self.update)
+            self.timer.setInterval(500)
+            self.timer.start()
 
 
     def labels(self, song: str, duration: int):
@@ -217,6 +226,7 @@ class ExampleApp(QMainWindow):
             self.settingsTimer2.setInterval(30)
             self.settingsTimer2.timeout.connect(self.move_down)
             self.settingsTimer2.start()
+
 
     def move_up(self):
     # Moves button up and shows it
