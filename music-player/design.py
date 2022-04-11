@@ -1,6 +1,77 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+style = """
+QSlider::groove:horizontal {
+background: rgba(0, 0, 0, 0);
+height: 10px;
+border-radius: 5px;
+}
 
+QSlider::sub-page:horizontal {
+background: qlineargradient(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, stop:0 rgba(40, 113, 250, 150), stop:1 rgba(103, 23, 205, 150));
+height: 10px;
+border-radius: 5px;
+}
+
+QSlider::add-page:horizontal {
+background: qlineargradient(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, stop:0 rgba(56, 56, 56, 150), stop:1 rgba(40, 40, 40, 150));
+height: 10px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border-color: #999;
+border-radius: 5px;
+}
+
+QSlider::add-page:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border-color: #999;
+border-radius: 5px;
+}
+
+QSlider::handle:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border: 1px solid #aaa;
+border-radius: 5px;
+}
+"""
+style_two = """
+QSlider::groove:horizontal {
+background: rgba(0, 0, 0, 0);
+height: 10px;
+border-radius: 5px;
+}
+
+QSlider::sub-page:horizontal {
+background: qlineargradient(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, stop:0 rgba(210, 90, 70, 0), stop:1 rgba(5, 240, 25, 0));
+height: 10px;
+border-radius: 5px;
+}
+
+QSlider::add-page:horizontal {
+background: qlineargradient(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, stop:0 rgba(56, 56, 56, 0), stop:1 rgba(40, 40, 40, 0));
+height: 10px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border-color: #999;
+border-radius: 5px;
+}
+
+QSlider::add-page:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border-color: #999;
+border-radius: 5px;
+}
+
+QSlider::handle:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border: 1px solid #aaa;
+border-radius: 5px;
+}
+"""
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -30,26 +101,24 @@ class Ui_MainWindow(object):
         font.setPointSize(16)
         self.total_time.setFont(font)
         self.total_time.setObjectName("total_time")
-        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setGeometry(QtCore.QRect(453, 185, 250, 10))
-        self.progressBar.setProperty("value", 0)
-        self.progressBar.setStyleSheet("QProgressBar{"
-                                        "border-radius: 4px;"
-                                        "background-color: qlineargradient"
-                                        "(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813,"
-                                        "stop:0 rgba(56, 56, 56, 150), stop:1 rgba(40, 40, 40, 150));}"
-                                        "QProgressBar::chunk{"
-                                        "border-radius: 4px;"
-                                        "background-color: qlineargradient"
-                                        "(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, "
-                                        "stop:0 rgba(40, 113, 250, 150), stop:1 rgba(103, 23, 205, 150));}")
-        self.progressBar.setFormat('')
-        self.progressBar.setObjectName("progressBar")
         self.volume_slider = QtWidgets.QSlider(self.centralwidget)
         self.volume_slider.setGeometry(QtCore.QRect(260, 553, 160, 25))
         self.volume_slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.volume_slider.setValue(88)
         self.volume_slider.setObjectName("volume_slider")
+        self.progress_slider = QtWidgets.QSlider(self.centralwidget)
+        self.progress_slider.setGeometry(QtCore.QRect(453, 185, 250, 10))
+        self.progress_slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.progress_slider.setStyleSheet(style)
+        self.progress_slider.setRange(0, 99)
+        self.progress_slider.setValue(0)
+        self.progress_slider.setTracking(False)
+        self.progress_slider_controlled = QtWidgets.QSlider(self.centralwidget)
+        self.progress_slider_controlled.setGeometry(QtCore.QRect(453, 185, 250, 10))
+        self.progress_slider_controlled.setOrientation(QtCore.Qt.Orientation.Horizontal)
+        self.progress_slider_controlled.setStyleSheet(style_two)
+        self.progress_slider.setRange(0, 99)
+        self.progress_slider_controlled.setValue(0)
         self.volume_button = QtWidgets.QPushButton(self.centralwidget)
         self.volume_button.setGeometry(QtCore.QRect(200, 540, 42, 42))
         self.volume_button.setAutoFillBackground(False)
@@ -135,3 +204,42 @@ class Ui_MainWindow(object):
         self.cur_time.setText(_translate("MainWindow", "00:00"))
         self.song_name.setText(_translate("MainWindow", "Add music to folder"))
         self.total_time.setText(_translate("MainWindow", "03:00"))
+
+
+class Ui_Dialog(object):
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.setFixedSize(320, 240)
+        self.warning_background = QtWidgets.QLabel(Dialog)
+        self.warning_background.setGeometry(QtCore.QRect(0, 0, 321, 241))
+        self.warning_background.setText("")
+        self.warning_background.setScaledContents(True)
+        self.warning_background.setObjectName("warning_background")
+        self.warning_background.setPixmap(QtGui.QPixmap("src/WarningBackGround.png"))
+        self.warning_background.setScaledContents(True)
+        self.info_label = QtWidgets.QLabel(Dialog)
+        self.info_label.setGeometry(QtCore.QRect(70, 50, 180, 90))
+        font = QtGui.QFont()
+        font.setPointSize(22)
+        font.setBold(False)
+        font.setWeight(50)
+        self.info_label.setFont(font)
+        self.info_label.setScaledContents(False)
+        self.info_label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.info_label.setWordWrap(True)
+        self.info_label.setObjectName("label")
+        self.okey_button = QtWidgets.QPushButton(Dialog)
+        self.okey_button.setGeometry(QtCore.QRect(105, 160, 110, 32))
+        self.okey_button.setObjectName("pushButton")
+        
+
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", ""))
+        self.info_label.setText(_translate("Dialog", "Добавьте музыку в папку"))
+        self.okey_button.setText(_translate("Dialog", "Окей"))
+
+    
