@@ -1,6 +1,6 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-style = """
+progress_bar_style = """
 QSlider::groove:horizontal {
 background: rgba(0, 0, 0, 0);
 height: 10px;
@@ -36,7 +36,7 @@ border: 1px solid #aaa;
 border-radius: 5px;
 }
 """
-style_two = """
+controlled_progress_bar_style = """
 QSlider::groove:horizontal {
 background: rgba(0, 0, 0, 0);
 height: 10px;
@@ -72,6 +72,56 @@ border: 1px solid #aaa;
 border-radius: 5px;
 }
 """
+volume_slider_style = """
+QSlider::groove:horizontal {
+background: rgba(0, 0, 0, 0);
+height: 10px;
+border-radius: 5px;
+}
+
+QSlider::sub-page:horizontal {
+background: qlineargradient(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, stop:0 rgba(40, 113, 250, 150), stop:1 rgba(103, 23, 205, 150));
+height: 10px;
+border-radius: 5px;
+}
+
+QSlider::add-page:horizontal {
+background: qlineargradient(spread:pad, x1:0.463054, y1:0.0965909, x2:0.487685, y2:0.813, stop:0 rgba(56, 56, 56, 150), stop:1 rgba(40, 40, 40, 150));
+height: 10px;
+}
+
+QSlider::handle:horizontal {
+background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+    stop:0 #eee, stop:1 #ccc);
+border: 1px solid #777;
+width: 13px;
+margin-top: -2px;
+margin-bottom: -2px;
+border-radius: 6px;
+}
+QSlider::handle:horizontal:hover {
+background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+    stop:0 #fff, stop:1 #ddd);
+border: 1px solid #444;
+border-radius: 6px;
+}
+QSlider::sub-page:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border-color: #999;
+border-radius: 5px;
+}
+
+QSlider::add-page:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border-color: #999;
+border-radius: 5px;
+}
+
+QSlider::handle:horizontal:disabled {
+background: rgba(0, 0, 0, 0);
+border: 1px solid #aaa;
+border-radius: 5px;
+}"""
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -102,25 +152,26 @@ class Ui_MainWindow(object):
         self.total_time.setFont(font)
         self.total_time.setObjectName("total_time")
         self.volume_slider = QtWidgets.QSlider(self.centralwidget)
-        self.volume_slider.setGeometry(QtCore.QRect(260, 553, 160, 25))
+        self.volume_slider.setGeometry(QtCore.QRect(320, 553, 160, 25))
         self.volume_slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.volume_slider.setValue(88)
+        self.volume_slider.setStyleSheet(volume_slider_style)
         self.volume_slider.setObjectName("volume_slider")
         self.progress_slider = QtWidgets.QSlider(self.centralwidget)
         self.progress_slider.setGeometry(QtCore.QRect(453, 185, 250, 10))
         self.progress_slider.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.progress_slider.setStyleSheet(style)
+        self.progress_slider.setStyleSheet(progress_bar_style)
         self.progress_slider.setRange(0, 99)
         self.progress_slider.setValue(0)
         self.progress_slider.setTracking(False)
         self.progress_slider_controlled = QtWidgets.QSlider(self.centralwidget)
         self.progress_slider_controlled.setGeometry(QtCore.QRect(453, 185, 250, 10))
         self.progress_slider_controlled.setOrientation(QtCore.Qt.Orientation.Horizontal)
-        self.progress_slider_controlled.setStyleSheet(style_two)
+        self.progress_slider_controlled.setStyleSheet(controlled_progress_bar_style)
         self.progress_slider.setRange(0, 99)
         self.progress_slider_controlled.setValue(0)
         self.volume_button = QtWidgets.QPushButton(self.centralwidget)
-        self.volume_button.setGeometry(QtCore.QRect(200, 540, 42, 42))
+        self.volume_button.setGeometry(QtCore.QRect(270, 540, 42, 42))
         self.volume_button.setAutoFillBackground(False)
         self.volume_button.setText("")
         iconV = QtGui.QIcon()
@@ -128,6 +179,16 @@ class Ui_MainWindow(object):
         self.volume_button.setIcon(iconV)
         self.volume_button.setIconSize(QtCore.QSize(42, 42))
         self.volume_button.setStyleSheet("background-color: rgba(255, 255, 255, 0);\n"
+"border: none;")
+        self.loop_button = QtWidgets.QPushButton(self.centralwidget)
+        self.loop_button.setGeometry(QtCore.QRect(200, 540, 42, 42))
+        self.loop_button.setAutoFillBackground(False)
+        self.loop_button.setText("")
+        iconR = QtGui.QIcon()
+        iconR.addPixmap(QtGui.QPixmap("src/loop.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        self.loop_button.setIcon(iconR)
+        self.loop_button.setIconSize(QtCore.QSize(42, 42))
+        self.loop_button.setStyleSheet("background-color: rgba(255, 255, 255, 0);\n"
 "border: none;")
         self.pause_button = QtWidgets.QPushButton(self.centralwidget)
         self.pause_button.setGeometry(QtCore.QRect(20, 540, 42, 42))

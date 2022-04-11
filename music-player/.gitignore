@@ -1,3 +1,6 @@
 /build
 /dist
-/music/*
+music/*
+.DS_Store
+src/.DS_Store
+/__pycache__

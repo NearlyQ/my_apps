@@ -44,16 +44,14 @@ def open_folder():
 
 def add_to_playlist() -> list:
         # Adds music from music folder to playlist
-        playlist = os.listdir('music')
-        playlist = is_music(playlist)
+        playlist = is_music(os.listdir('music'))
         return playlist
 
+
 #Add first song and initialize playlist
-playlist = os.listdir('music')
-playlist = is_music(playlist)
+playlist = add_to_playlist()
 if len(playlist) > 0:
     pygame.mixer.music.load('music/'+playlist[0])
-    first = pygame.mixer.Sound('music/'+playlist[0])
 
 
 class ExampleApp(QMainWindow):
@@ -65,17 +63,21 @@ class ExampleApp(QMainWindow):
         self.ui = design.Ui_MainWindow()
         self.ui.setupUi(self)
 
-        # Important variables for functions
-        self.check = False
+        """Important variables for functions"""
+        # Bool variables
         self.check_volume = True
         self.check_settings = False
+        self.slider_changed = False
+        self.looping = False
+        # Digit variables
         self.i = 0
-        self.igrek = 535
+        self.folder_button_y = 535
         self.music_time_now = 0
         self.prev_volume = 0.88
-        self.pic = QtGui.QIcon()
-        self.pr = QtGui.QIcon()
-        self.slider_changed = False
+        # Icon variables
+        self.volune_button_icon = QtGui.QIcon()
+        self.pause_icon = QtGui.QIcon()
+        self.loop_icon = QtGui.QIcon()
 
         if len(playlist) == 0:
         # Condition opens music folder if it's clear
@@ -95,23 +97,19 @@ class ExampleApp(QMainWindow):
             self.ui.volume_button.clicked.connect(self.volume_off)
             self.ui.add_song_button.clicked.connect(open_folder)
             self.ui.settings_button.clicked.connect(self.move_button)
+            self.ui.loop_button.clicked.connect(self.loop)
             self.ui.volume_slider.valueChanged.connect(self.volume)
             self.ui.progress_slider_controlled.valueChanged.connect(self.follow_progress)
             self.ui.progress_slider_controlled.sliderReleased.connect(self.progress_changed)
             self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
-            self.labels(playlist[self.i], int(pygame.mixer.Sound.get_length(first)))
+            self.labels(playlist[self.i], int(pygame.mixer.Sound.get_length(self.mus)))
 
-            # Timer for update-function
+            # Timer for update-function and music timer
             self.timer = QtCore.QTimer()
-            self.timer.timeout.connect(self.update)
+            self.timer.timeout.connect(self.activate_every_half_second)
             self.timer.setInterval(500)
             self.timer.start()
 
-            # Timer for music_timer
-            self.music_timer = QtCore.QTimer()
-            self.music_timer.timeout.connect(self.music_timer_update)
-            self.music_timer.setInterval(500)
-            self.music_timer.start()
 
             self.now = int(pygame.mixer.music.get_pos()/1000)
             self.total = int(pygame.mixer.Sound.get_length(self.mus))
@@ -122,6 +120,11 @@ class ExampleApp(QMainWindow):
     # Sets text to the labels(song name, current time and total time)
         self.ui.song_name.setText(normal_name(song))
         self.ui.total_time.setText(convert(duration))
+
+
+    def activate_every_half_second(self):
+        self.update()
+        self.music_timer_update()
 
 
     def update(self):
@@ -138,8 +141,13 @@ class ExampleApp(QMainWindow):
 
     def is_next(self):
     # Plays the next song, when current is over(don't delete it)
-        if self.total - self.music_time_now <= 1:
-            self.next()
+        if self.total < self.music_time_now:
+            if not self.looping:
+                self.next()
+            elif self.looping:
+                pygame.mixer.music.play()
+                self.music_time_now = 0
+                return self.music_time_now
 
 
     def music_timer_update(self):
@@ -151,29 +159,29 @@ class ExampleApp(QMainWindow):
     """Block of functions 2. Pause and Resume"""
     def pause_resume(self):
     #Checks the signal and pauses or resumes music
-        self.check = not self.check
-        if not self.check:
+        if not pygame.mixer.music.get_busy():
             self.pause()
             pygame.mixer.music.unpause()
-        elif self.check:
+        elif pygame.mixer.music.get_busy():
             self.resume()
             pygame.mixer.music.pause()
 
 
     def pause(self):
-        self.pr.addPixmap(QtGui.QPixmap("src/pause.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
-        self.ui.pause_button.setIcon(self.pr)
+        self.pause_icon.addPixmap(QtGui.QPixmap("src/pause.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+        self.ui.pause_button.setIcon(self.pause_icon)
 
 
     def resume(self):
-        self.pr.addPixmap(QtGui.QPixmap("src/resume.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
-        self.ui.pause_button.setIcon(self.pr)
+        self.pause_icon.addPixmap(QtGui.QPixmap("src/resume.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+        self.ui.pause_button.setIcon(self.pause_icon)
 
 
     """Block of functions 3. Play previous or next music"""
     def prev(self):
     # Plays previous song, when prev_button is clicked
-        now = int(pygame.mixer.music.get_pos()/1000)
+        now = self.music_time_now
+        self.music_time_now = 0
         if now < 5:
             pygame.mixer.music.stop()
             self.i -= 1
@@ -183,7 +191,6 @@ class ExampleApp(QMainWindow):
                 pygame.mixer.music.load('music/'+playlist[self.i])
                 pygame.mixer.music.play()
                 self.pause()
-                self.music_time_now = 0
                 return [self.i, self.mus, self.music_time_now]
             else:
                 self.i = len(playlist)-1
@@ -191,23 +198,23 @@ class ExampleApp(QMainWindow):
                 pygame.mixer.music.load('music/'+playlist[self.i])
                 pygame.mixer.music.play()
                 self.pause()
-                self.music_time_now = 0
                 return [self.i, self.music_time_now]
         elif now >=5:
             pygame.mixer.music.play()
+            return self.music_time_now
 
 
     def next(self):
     # Plays next song, when next_button is clicked
         pygame.mixer.music.stop()
         self.i += 1
+        self.music_time_now = 0
         #Condition is needed to loop playlist
         if self.i < len(playlist):
             self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
             pygame.mixer.music.load('music/'+playlist[self.i])
             pygame.mixer.music.play()
             self.pause()
-            self.music_time_now = 0
             return [self.i, self.mus, self.music_time_now]
         else:
             self.i = 0
@@ -215,7 +222,6 @@ class ExampleApp(QMainWindow):
             pygame.mixer.music.load('music/'+playlist[self.i])
             pygame.mixer.music.play()
             self.pause()
-            self.music_time_now = 0
             return [self.i, self.music_time_now]
 
 
@@ -263,11 +269,11 @@ class ExampleApp(QMainWindow):
         volume_value = self.ui.volume_slider.value()/100
         pygame.mixer.music.set_volume(volume_value)
         if volume_value == 0:
-            self.pic.addPixmap(QtGui.QPixmap("src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-            self.ui.volume_button.setIcon(self.pic)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.ui.volume_button.setIcon(self.volune_button_icon)
         else:
-            self.pic.addPixmap(QtGui.QPixmap("src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-            self.ui.volume_button.setIcon(self.pic)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.ui.volume_button.setIcon(self.volune_button_icon)
 
 
     def volume_off(self):
@@ -276,15 +282,27 @@ class ExampleApp(QMainWindow):
         if self.check_volume:
             self.ui.volume_slider.setValue(self.prev_volume*100)
             pygame.mixer.music.set_volume(self.prev_volume)
-            self.pic.addPixmap(QtGui.QPixmap("src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-            self.ui.volume_button.setIcon(self.pic)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.ui.volume_button.setIcon(self.volune_button_icon)
         elif not self.check_volume:
             self.prev_volume = self.ui.volume_slider.value()/100
             self.ui.volume_slider.setValue(0)
             pygame.mixer.music.set_volume(0)
-            self.pic.addPixmap(QtGui.QPixmap("src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
-            self.ui.volume_button.setIcon(self.pic)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.ui.volume_button.setIcon(self.volune_button_icon)
             return self.prev_volume
+
+
+    """Block of functions 7. Loop button"""
+    def loop(self):
+        self.looping = not self.looping
+        if not self.looping:
+            self.loop_icon.addPixmap(QtGui.QPixmap("src/loop.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+            self.ui.loop_button.setIcon(self.loop_icon)
+        elif self.looping:
+            self.loop_icon.addPixmap(QtGui.QPixmap("src/loop_true.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+            self.ui.loop_button.setIcon(self.loop_icon)
+        return self.looping
 
 
     """Block of functions 6. Settings button"""
@@ -306,20 +324,20 @@ class ExampleApp(QMainWindow):
 
     def move_up(self):
     # Moves button up and shows it
-        if self.igrek > 490:
-            self.igrek -= 5
-            self.ui.add_song_button.move(720, self.igrek)
-            return self.igrek
-        elif self.igrek <= 490:
+        if self.folder_button_y > 490:
+            self.folder_button_y -= 5
+            self.ui.add_song_button.move(720, self.folder_button_y)
+            return self.folder_button_y
+        elif self.folder_button_y <= 490:
             self.settingsTimer1.stop()
 
 
     def move_down(self):
     # Moves button dows and hides it
-        if self.igrek < 535:
-            self.igrek += 5
-            self.ui.add_song_button.move(720, self.igrek)
-        elif self.igrek >= 535:
+        if self.folder_button_y < 535:
+            self.folder_button_y += 5
+            self.ui.add_song_button.move(720, self.folder_button_y)
+        elif self.folder_button_y >= 535:
             self.ui.add_song_button.hide()
             self.settingsTimer2.stop()
 
