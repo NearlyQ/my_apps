@@ -34,7 +34,9 @@ def convert(seconds: int):
 
 
 def open_folder():
-    # Opens music folder depending of system
+    # Opens music folder depending of system and creates it, if it doesn't exist
+        if not os.path.exists('music'):
+            os.mkdir('music')
         if sys.platform == "win32":
             os.startfile('music')
         else:
@@ -49,9 +51,11 @@ def add_to_playlist() -> list:
 
 
 #Add first song and initialize playlist
-playlist = add_to_playlist()
-if len(playlist) > 0:
-    pygame.mixer.music.load('music/'+playlist[0])
+playlist = []
+if os.path.exists('music'):
+    playlist = add_to_playlist()
+    if len(playlist) > 0:
+        pygame.mixer.music.load('music/'+playlist[0])
 
 
 class ExampleApp(QMainWindow):
