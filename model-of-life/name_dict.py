@@ -1,0 +1,15 @@
+name_dict = {'Male': [  'Bruce','Clyde','Colt',
+                        'Devon','Gordon','Jackson','Jasper',
+                        'Jax','Lenny','Leo','Logan',
+                        'Luca','Oliver','Pascal','Peter',
+                        'Pier','Ramsey','Randy','Ricky',
+                        'Sly','Troy','Walter',
+                        'Wayne','Wilbur','Woody', 'Ziggy'],
+             'Female': ['Anita','Arabelle','Beauty','Bella',
+                        'Betty','Bindi','Brandy','Bristol',
+                        'Cassie','Dharia','Dolly','Electra',
+                        'Elle','Giselle','Helen','Holly',
+                        'Hope','Iris','Kara','Kira',
+                        'Layla','Leia','Margo','Marley',
+                        'Pearl','Sienna','Wynona','Xena','Zoe']
+            }
