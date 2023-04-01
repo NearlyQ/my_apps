@@ -35,27 +35,27 @@ def convert(seconds: int):
 
 def open_folder():
     # Opens music folder depending of system and creates it, if it doesn't exist
-        if not os.path.exists('music'):
-            os.mkdir('music')
+        if not os.path.exists('music-player/music'):
+            os.mkdir('music-player/music')
         if sys.platform == "win32":
-            os.startfile('music')
+            os.startfile('music-player/music')
         else:
             opener ="open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, 'music'])
+            subprocess.call([opener, 'music-player/music'])
 
 
 def add_to_playlist() -> list:
         # Adds music from music folder to playlist
-        playlist = is_music(os.listdir('music'))
+        playlist = is_music(os.listdir('music-player/music'))
         return playlist
 
 
 #Add first song and initialize playlist
 playlist = []
-if os.path.exists('music'):
+if os.path.exists('music-player/music'):
     playlist = add_to_playlist()
     if len(playlist) > 0:
-        pygame.mixer.music.load('music/'+playlist[0])
+        pygame.mixer.music.load('music-player/music/'+playlist[0])
 
 
 class ExampleApp(QMainWindow):
@@ -105,7 +105,7 @@ class ExampleApp(QMainWindow):
             self.ui.volume_slider.valueChanged.connect(self.volume)
             self.ui.progress_slider_controlled.valueChanged.connect(self.follow_progress)
             self.ui.progress_slider_controlled.sliderReleased.connect(self.progress_changed)
-            self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
+            self.mus = pygame.mixer.Sound('music-player/music/'+playlist[self.i])
             self.labels(playlist[self.i], int(pygame.mixer.Sound.get_length(self.mus)))
 
             # Timer for update-function and music timer
@@ -172,12 +172,12 @@ class ExampleApp(QMainWindow):
 
 
     def pause(self):
-        self.pause_icon.addPixmap(QtGui.QPixmap("src/pause.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+        self.pause_icon.addPixmap(QtGui.QPixmap("music-player/src/pause.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
         self.ui.pause_button.setIcon(self.pause_icon)
 
 
     def resume(self):
-        self.pause_icon.addPixmap(QtGui.QPixmap("src/resume.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+        self.pause_icon.addPixmap(QtGui.QPixmap("music-player/src/resume.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
         self.ui.pause_button.setIcon(self.pause_icon)
 
 
@@ -191,15 +191,15 @@ class ExampleApp(QMainWindow):
             self.i -= 1
             #Condition is needed to loop playlist
             if self.i >= 0:
-                self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
-                pygame.mixer.music.load('music/'+playlist[self.i])
+                self.mus = pygame.mixer.Sound('music-player/music/'+playlist[self.i])
+                pygame.mixer.music.load('music-player/music/'+playlist[self.i])
                 pygame.mixer.music.play()
                 self.pause()
                 return [self.i, self.mus, self.music_time_now]
             else:
                 self.i = len(playlist)-1
-                self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
-                pygame.mixer.music.load('music/'+playlist[self.i])
+                self.mus = pygame.mixer.Sound('music-player/music/'+playlist[self.i])
+                pygame.mixer.music.load('music-player/music/'+playlist[self.i])
                 pygame.mixer.music.play()
                 self.pause()
                 return [self.i, self.music_time_now]
@@ -215,15 +215,15 @@ class ExampleApp(QMainWindow):
         self.music_time_now = 0
         #Condition is needed to loop playlist
         if self.i < len(playlist):
-            self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
-            pygame.mixer.music.load('music/'+playlist[self.i])
+            self.mus = pygame.mixer.Sound('music-player/music/'+playlist[self.i])
+            pygame.mixer.music.load('music-player/music/'+playlist[self.i])
             pygame.mixer.music.play()
             self.pause()
             return [self.i, self.mus, self.music_time_now]
         else:
             self.i = 0
-            self.mus = pygame.mixer.Sound('music/'+playlist[self.i])
-            pygame.mixer.music.load('music/'+playlist[self.i])
+            self.mus = pygame.mixer.Sound('music-player/music/'+playlist[self.i])
+            pygame.mixer.music.load('music-player/music/'+playlist[self.i])
             pygame.mixer.music.play()
             self.pause()
             return [self.i, self.music_time_now]
@@ -273,10 +273,10 @@ class ExampleApp(QMainWindow):
         volume_value = self.ui.volume_slider.value()/100
         pygame.mixer.music.set_volume(volume_value)
         if volume_value == 0:
-            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("music-player/src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
             self.ui.volume_button.setIcon(self.volune_button_icon)
         else:
-            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("music-player/src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
             self.ui.volume_button.setIcon(self.volune_button_icon)
 
 
@@ -286,13 +286,13 @@ class ExampleApp(QMainWindow):
         if self.check_volume:
             self.ui.volume_slider.setValue(self.prev_volume*100)
             pygame.mixer.music.set_volume(self.prev_volume)
-            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("music-player/src/sound.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
             self.ui.volume_button.setIcon(self.volune_button_icon)
         elif not self.check_volume:
             self.prev_volume = self.ui.volume_slider.value()/100
             self.ui.volume_slider.setValue(0)
             pygame.mixer.music.set_volume(0)
-            self.volune_button_icon.addPixmap(QtGui.QPixmap("src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+            self.volune_button_icon.addPixmap(QtGui.QPixmap("music-player/src/soundoff.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
             self.ui.volume_button.setIcon(self.volune_button_icon)
             return self.prev_volume
 
@@ -301,10 +301,10 @@ class ExampleApp(QMainWindow):
     def loop(self):
         self.looping = not self.looping
         if not self.looping:
-            self.loop_icon.addPixmap(QtGui.QPixmap("src/loop.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+            self.loop_icon.addPixmap(QtGui.QPixmap("music-player/src/loop.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
             self.ui.loop_button.setIcon(self.loop_icon)
         elif self.looping:
-            self.loop_icon.addPixmap(QtGui.QPixmap("src/loop_true.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
+            self.loop_icon.addPixmap(QtGui.QPixmap("music-player/src/loop_true.png"), QtGui.QIcon.Mode.Active, QtGui.QIcon.State.Off)
             self.ui.loop_button.setIcon(self.loop_icon)
         return self.looping
 
@@ -362,7 +362,7 @@ class WarningExample(QDialog):
 def main():
     # Main function. Initializes window, shows it and opens
     app = QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon('src/icon.png'))
+    app.setWindowIcon(QtGui.QIcon('music-player/src/icon.png'))
     if len(playlist) > 0:
         window = ExampleApp()
         window.show()
