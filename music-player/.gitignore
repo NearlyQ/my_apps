@@ -3,8 +3,4 @@
 music/*
 .DS_Store
 src/.DS_Store
-/vscode/
-./eggs
-/venv
-/.idea
 /__pycache__
