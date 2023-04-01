@@ -13,3 +13,8 @@ Install pygame and PyQt6 modules
 
 Add music into music folder  
 Open app again  
+
+**Important:**  
+Run the program from main directory, not from "music-player"  
+Example:  
+```python3 my_apps/music-player/main.py```
