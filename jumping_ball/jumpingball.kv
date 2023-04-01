@@ -1,0 +1,30 @@
+#:kivy 2.1.0
+#: import get_color_from_hex kivy.utils.get_color_from_hex
+#: import Gradient kivy_gradient.Gradient
+
+
+<JumpingBall>:
+    size: 50, 50 
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Ellipse:
+            pos: self.pos
+            size: self.size          
+            texture: Gradient.horizontal(get_color_from_hex("F772D1"), get_color_from_hex("C872F2"))
+
+
+<JumpingBallGame>:
+    ball: jumping_ball
+    start: label
+    Label:
+        id: label
+        center: self.parent.center
+        size: 200, 100
+        text: 'Tap to turn on gravity'
+        font_size: 24
+
+
+    JumpingBall:
+        id: jumping_ball
+        pos: self.pos
