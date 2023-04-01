@@ -12,27 +12,17 @@ from kivy.clock import Clock
 G = 9.8
 C = 0.05
 
-def is_even(a):
-    if a%2 == 0:
-        return True
-    else:
-        return False
 
-
-def foo(list, num):
-    if is_even(num):
-        return list[0]
-    else:
-        return list[1]
-
-
-def filo(filo, num, item):
-    if len(filo) < num:
-        filo.append(item)
-    elif len(filo) == num:
-        filo.pop(0)
-        filo.append(item)
-    return filo
+# Functions, that calculates psysical quantities
+# Throw force returns a list with 2 coordinates:
+# when ball was thrown and its position on previous frame
+def throw_force(throw_force, num, item):
+    if len(throw_force) < num:
+        throw_force.append(item)
+    elif len(throw_force) == num:
+        throw_force.pop(0)
+        throw_force.append(item)
+    return throw_force
 def find_velocity_y(y: float, tmp: int, smth: bool):
     speed = round(((2*G*(tmp-y)*C))**(1/2), 2)
     if smth:
@@ -55,6 +45,7 @@ def find_additional_velocity_zero(coords: list):
         return 0
 
 
+# Class JumpingBall, that has main jumper characteristics and functions
 class JumpingBall(Widget):
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
@@ -67,10 +58,13 @@ class JumpingBall(Widget):
     condition_for_falling = True
 
 
+# Moves ball according to his velocity
     def move(self):
         self.pos = Vector(*self.velocity) + self.pos
 
 
+# When ball touches ground or walls, his horisontal velocity changes. 
+# If horisontal velocity module less than 0.1, it became 0
     def change_velocity_x(self):
         if -0.1 >= self.velocity_x <= 0.1:
             self.velocity_x = 0
@@ -78,6 +72,7 @@ class JumpingBall(Widget):
             self.velocity_x *= 0.8
 
 
+# Main function, that simulates physics
     def physic(self):
         if self.condition_for_falling and self.gravitation:
             if self.y <= 0 and not self.moving:
@@ -104,6 +99,7 @@ class JumpingBall(Widget):
                 self.velocity_x *= 0.95
 
 
+# Main Window class
 class JumpingBallGame(Widget):
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)
@@ -111,11 +107,13 @@ class JumpingBallGame(Widget):
     visible = True
 
 
+# Function serves the ball to current position
     def serve_ball(self):
         self.ball.center = (self.center_x, self.top*0.8)
         self.ball.tmp = self.ball.y
 
 
+# When button is pressed, gravitation turns on
     def turn_on_gravity(self):
         self.visible = False
         self.ball.gravitation = True
@@ -123,6 +121,7 @@ class JumpingBallGame(Widget):
         return self.ball.gravitation
 
 
+# Update function, that executes dt times per second
     def update(self, dt):
         self.ball.physic()
         self.ball.move()
@@ -135,6 +134,7 @@ class JumpingBallGame(Widget):
             self.ball.velocity_x *= -0.8
     
 
+# When player taps on the ball, it stops
     def on_touch_down(self, touch):
         if (self.ball.x-25) < touch.x < (self.ball.x+75) and \
             (self.ball.y-25) < touch.y < (self.ball.y+75) and \
@@ -146,15 +146,17 @@ class JumpingBallGame(Widget):
             self.ball.moving = True
 
 
+# When player moves the cursor after touching the ball, ball will follow the cursor
     def on_touch_move(self, touch):
         if self.ball.moving and 25 < touch.x < self.right-25 and \
             25 < touch.y < self.top-25:
             self.ball.velocity_y = 0
             self.ball.center_y = touch.y
             self.ball.center_x = touch.x
-            filo(self.ball.coordinates, 2, (self.ball.center_x, self.ball.center_y))
+            throw_force(self.ball.coordinates, 2, (self.ball.center_x, self.ball.center_y))
 
 
+# When player releases the cursor, the ball is thrown
     def on_touch_up(self, touch):
         if not self.visible and self.ball.moving:
             self.throw()
@@ -164,6 +166,7 @@ class JumpingBallGame(Widget):
             self.turn_on_gravity()
 
 
+# Function, that throws the ball
     def throw(self):
         self.ball.velocity_zero = find_additional_velocity_zero(self.ball.coordinates)
         self.ball.tmp = int(self.ball.y)+find_height_max(self.ball.velocity_zero)
@@ -176,6 +179,7 @@ class JumpingBallGame(Widget):
             self.ball.falling = True
 
 
+# Main class, that starts the game
 class JumpingBallApp(App):
     def build(self):
         game = JumpingBallGame()
