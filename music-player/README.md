@@ -1,10 +1,10 @@
-###Music player Galaxy
+**Music player Galaxy**
 
-#Requirements:
+**Requirements:**
 pygame
 PyQt6
 
-#Instruction:
+**Instruction:**
 Install pygame and PyQt6 modules
 ```pip install pygame```
 ```pip install PyQt6```
