@@ -1,1 +1,1 @@
-Hello
+Repository for pet-apps.
