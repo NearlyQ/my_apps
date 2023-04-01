@@ -1,4 +1,4 @@
-###**Music player Galaxy**###
+**###Music player Galaxy###**
 
 #**Requirements:**#
 pygame
