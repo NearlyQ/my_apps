@@ -8,7 +8,7 @@ This program emulates life of frogs. They need to pick and eat apple, cut the tr
 PyQt6
 
 **Instruction:**  
-If you don't have, you need to download PyQt6
+If you don't have, you need to download PyQt6  
 ```pip install PyQt6```  
 And then run the program.  
 **Important:**  
